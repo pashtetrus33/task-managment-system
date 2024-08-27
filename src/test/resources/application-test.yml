@@ -1,0 +1,48 @@
+# Spring DataSource Configuration
+spring:
+  datasource:
+    # URL for the in-memory H2 database. The `DB_CLOSE_DELAY=-1` ensures the database stays alive even after all connections are closed.
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    # Driver class for H2 database
+    driver-class-name: org.h2.Driver
+    # Username for database access (default for H2 is 'sa')
+    username: sa
+    # Password for database access (H2 default is no password, can be set if needed)
+    password:
+
+  # H2 Database Console Configuration
+  h2:
+    console:
+      # Enables the H2 database web console at /h2-console
+      enabled: true
+
+  # JPA and Hibernate Configuration
+  jpa:
+    hibernate:
+      # Schema generation strategy. 'create-drop' creates the schema at startup and drops it at shutdown.
+      ddl-auto: create-drop
+    # Enables logging of SQL statements to the console
+    show-sql: true
+
+# Keycloak Configuration
+keycloak:
+  # Base URL for the Keycloak authentication server
+  auth-server-url: http://localhost:8180/auth
+  # Specifies the Keycloak realm to use
+  realm: test
+  # Client ID registered in Keycloak for this application
+  resource: test-client
+  credentials:
+    # Client secret for the application (configured in Keycloak)
+    secret: test-secret
+  # Use roles defined at the client level in Keycloak
+  use-resource-role-mappings: true
+  # Security constraints to define access rules
+  security-constraints:
+    - authRoles:
+        # The 'user' role is required to access resources matching the specified patterns
+        - user
+      securityCollections:
+        # Apply the security constraints to all URLs in the application
+        - patterns:
+            - /**

@@ -1,0 +1,102 @@
+# Spring application configuration
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: task-mgt-system
+            # The secret key for the client, retrieved from the environment variable
+            client-secret: "${API_SECRET}"
+            # The OAuth2 grant type, set to authorization_code for authorization code flow
+            authorization-grant-type: authorization_code
+            # Scope of access, typically 'openid' for authentication
+            scope: openid
+            # Redirect URI after authentication, placeholders for baseUrl and registrationId
+            #redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: http://localhost:8081/login/oauth2/code/keycloak
+        provider:
+          keycloak:
+            # The URI of the Keycloak server's issuer
+            #issuer-uri: http://keycloak:8585/realms/taskmgt
+            issuer-uri: http://localhost:8585/realms/taskmgt
+      resourceserver:
+        jwt:
+          # URI where JWT tokens are validated
+          #issuer-uri: http://keycloak:8585/realms/taskmgt
+          issuer-uri: http://localhost:8585/realms/taskmgt
+
+  application:
+    name: task-mgt-system
+    # Name of the application
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      # Automatically update the database schema based on the entity models
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # Hibernate dialect for PostgreSQL
+    open-in-view: true
+    # Enables open session in view to avoid lazy loading exceptions
+
+  datasource:
+    #url: jdbc:postgresql://postgres-db:5432/task_management
+    url: jdbc:postgresql://localhost:5432/task_management
+    # JDBC URL for connecting to the PostgreSQL database
+    username: "${POSTGRES_USER}"
+    # Database username
+    password: "${POSTGRES_PASSWORD}"
+    # Database password
+    hikari:
+      schema: app_schema
+      # Schema to use for the database connection
+      connection-init-sql: create schema if not exists app_schema
+      # SQL to run to ensure the schema exists
+      connection-timeout: 10000
+      # Connection timeout in milliseconds
+
+
+server:
+  port: 8081
+  # Port on which the application will run
+
+app:
+  # Client ID for OAuth2 authentication
+  client-id: task-mgt-system
+  # URL for obtaining access tokens
+  #resource-url: http://keycloak:8585/realms/taskmgt/protocol/openid-connect/token
+  resource-url: http://localhost:8585/realms/taskmgt/protocol/openid-connect/token
+
+  #jwk-set-uri: http://keycloak:8585/realms/taskmgt/protocol/openid-connect/certs
+  jwk-set-uri: http://localhost:8585/realms/taskmgt/protocol/openid-connect/certs
+
+  # OAuth2 grant type for password credentials
+  grant-type: password
+
+  # Secret key for the application, retrieved from the environment variable
+  secret: "${API_SECRET}"
+
+  cache:
+    cacheType: inMemory
+    # Type of cache being used (in-memory).
+    cacheNames:
+      - databaseEntities
+      - databaseEntityById
+    # List of cache names to be used.
+    caches:
+      databaseEntities:
+        expiry: 15s
+        # Expiry duration for the 'databaseEntities' cache.
+      databaseEntityById:
+        expiry: 20s
+        # Expiry duration for the 'databaseEntityByName' cache.
+
+
+# Springdoc configuration for API documentation
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
